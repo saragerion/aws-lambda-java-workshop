@@ -10,6 +10,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.DescribeTableRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,15 @@ public class TransactionRepository {
             .region(Region.of(System.getenv(SdkSystemSetting.AWS_REGION.environmentVariable())))
             .httpClientBuilder(AwsCrtAsyncHttpClient.builder())
             .build();
+
+    public TransactionRepository () {
+        try {
+            dynamoDbClient.describeTable(DescribeTableRequest.builder().build()).get();
+        } catch (Exception e) {
+            //TODO
+        }
+    }
+
 
     public Optional<Transaction> writeTransaction(Transaction transaction) {
         try {

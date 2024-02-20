@@ -5,18 +5,23 @@ import com.unicorn.broker.model.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.crac.Context;
+import org.crac.Resource;
+import org.crac.Core;
+
 
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class TransactionService {
+public class TransactionService implements Resource {
 
-    private UUID BROKER_ID = UUID.randomUUID();
+    private UUID BROKER_ID; // = UUID.randomUUID();
     private final TransactionRepository transactionRepository;
     private final Logger logger = LoggerFactory.getLogger(TransactionService.class);
 
     public TransactionService(final TransactionRepository transactionRepository) {
+        Core.getGlobalContext().register(this);
         this.transactionRepository = transactionRepository;
     }
 
@@ -32,4 +37,16 @@ public class TransactionService {
             return Optional.empty();
         }
     }
+
+    @Override
+    public void beforeCheckpoint(Context<? extends Resource> context) throws Exception {
+        logger.info("Hello from before checkpoint hook");
+    }
+
+   @Override
+   public void afterRestore(Context<? extends Resource> context) throws Exception {
+        logger.info("Hello from afterRestore hook");
+        BROKER_ID = UUID.randomUUID();
+   }
+
 }
